@@ -6,8 +6,8 @@ from bs4 import BeautifulSoup
 from PySide import QtCore, QtGui
 
 rp = os.path.dirname(os.path.realpath(__file__))
-hkxCliJar = os.path.join(rp, 'hkxpack-cli.jar')
-havokToFbx = os.path.join(rp, 'havok2fbx.exe')
+hkxCliJar = os.path.join(rp, "hkxpack-cli.jar")
+havokToFbx = os.path.join(rp, "havok2fbx.exe")
 
 if os.path.exists(hkxCliJar) != True:
 	print("ERROR! Could not find hkxpack-cli.jar file. You need to drop this gui file in the same folder as hkxpack-cli.jar file! Otherwise it won't work.")
@@ -15,8 +15,8 @@ if os.path.exists(hkxCliJar) != True:
 if os.path.exists(havokToFbx) != True:
 	print("ERROR! Could not find havok2fbx.exe file. You need to drop this gui file in the same folder as havok2fbx.exe file! Otherwise it won't work. Or you can drop all havok2fbx.exe files into the folder with this gui.")
 
-css = '''
-'''
+css = """
+"""
 
 class TestListView(QtGui.QListWidget):
 
@@ -52,7 +52,7 @@ class TestListView(QtGui.QListWidget):
 			event.ignore()
 
 class inputBoxWithBrowse(QtGui.QWidget):
-	def __init__(self, parent=None, label='', placeholderText='', defaultPath = ''):
+	def __init__(self, parent=None, label="", placeholderText="", defaultPath = ""):
 		super(inputBoxWithBrowse, self).__init__(parent)
 		self.placeholderText = placeholderText
 		self.mainLayout = QtGui.QHBoxLayout()
@@ -74,7 +74,7 @@ class inputBoxWithBrowse(QtGui.QWidget):
 		return self.lineEdit.text()
 
 	def browse(self):
-		fileName = QtGui.QFileDialog.getOpenFileName(self, caption=self.placeholderText, filter='*.hkx')
+		fileName = QtGui.QFileDialog.getOpenFileName(self, caption=self.placeholderText, filter="*.hkx")
 		self.lineEdit.setText(str(fileName[0]))
 
 class MainForm(QtGui.QMainWindow):
@@ -125,7 +125,7 @@ class MainForm(QtGui.QMainWindow):
 
 		self.hkxToFbxGrp = QtGui.QGroupBox("HKX (32bit) => FBX")
 
-		self.skeletonInput = inputBoxWithBrowse(label="skeleton.hkx", placeholderText="Locate skeleton.hkx file", defaultPath=os.path.join(rp, 'skeleton.hkx'))
+		self.skeletonInput = inputBoxWithBrowse(label="skeleton.hkx", placeholderText="Locate skeleton.hkx file", defaultPath=os.path.join(rp, "skeleton.hkx"))
 		self.hkxToFbxBtn = QtGui.QPushButton("Convert HKX to FBX")
 		self.hkxToFbxBtn.clicked.connect(self.convertHkxToFBXAnimation)
 
@@ -174,26 +174,26 @@ class MainForm(QtGui.QMainWindow):
 			print(file, fileRaw, fileExtension)
 
 			if fileExtension == ".hkx" or fileExtension == ".HKX":
-				fileto = fileRaw+'.fbx'
+				fileto = fileRaw+".fbx"
 				print("Converting", file, "to", fileto)
-				subprocess.call([havokToFbx, '-hk_skeleton', skeleton, '-hk_anim', file, '-fbx' , fileto])
+				subprocess.call([havokToFbx, "-hk_skeleton", skeleton, "-hk_anim", file, "-fbx" , fileto])
 			self.pb.setValue(i+1)
 		print("Done")
 
-	def convertXmlHkx (self, action = 'pack'):
+	def convertXmlHkx (self, action = "pack"):
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
 		for i in range (self.view.count()):
 			file = self.view.item(i).text()
-			fileExtension = file.split('.')[-1]
+			fileExtension = file.split(".")[-1]
 
 			if fileExtension == "hkx" or fileExtension == "HKX":
 				print(">>> Converting", file, "to xml")
-				subprocess.call(['java', '-jar', hkxCliJar, 'unpack', file])
+				subprocess.call(["java", "-jar", hkxCliJar, "unpack", file])
 
 			elif fileExtension == "xml" or fileExtension == "XML":
 				print("<<< Converting", file, "to hkx")
-				subprocess.call(['java', '-jar', hkxCliJar, 'pack', file])
+				subprocess.call(["java", "-jar", hkxCliJar, "pack", file])
 
 			else:
 				print("File", file, "is not hkx or xml. Skipped.")
@@ -205,36 +205,36 @@ class MainForm(QtGui.QMainWindow):
 		self.pb.setValue(0)
 		for i in range (self.view.count()):
 			file = self.view.item(i).text()
-			fileExtension = file.split('.')[-1]
+			fileExtension = file.split(".")[-1]
 
 			#if the file is hkx, we need to convert it to xml first.
 			if fileExtension == "hkx" or fileExtension == "HKX":
 				print(">>> Converting", file, "to xml")
-				subprocess.call(['java', '-jar', hkxCliJar, 'unpack', file])
-				file = file.replace('.hkx', '.xml').replace('.HKX', '.XML')
+				subprocess.call(["java", "-jar", hkxCliJar, "unpack", file])
+				file = file.replace(".hkx", ".xml").replace(".HKX", ".XML")
 
 			#read xml and extract data
 			print("Reading file...")
-			with open(file, 'r') as fileData:
-				soup = BeautifulSoup(fileData.read(), 'xml')
+			with open(file, "r") as fileData:
+				soup = BeautifulSoup(fileData.read(), "xml")
 
-			skeleton = soup.find('hkparam', {"name":"bones"})
+			skeleton = soup.find("hkparam", {"name":"bones"})
 			bones = []
 			for child in skeleton.contents:
-				childSoup = BeautifulSoup(str(child), 'xml')
-				boneNameParam = childSoup.find('hkparam', {"name":"name"})
+				childSoup = BeautifulSoup(str(child), "xml")
+				boneNameParam = childSoup.find("hkparam", {"name":"name"})
 				if boneNameParam != None:
-					bone = str(boneNameParam).split('"name">')[1].split('</hkparam>')[0]
+					bone = str(boneNameParam).split('"name">')[1].split("</hkparam>")[0]
 					bones.append(bone)
 
 			#generate txt
-			output = '[HAVOK SKELETON DEFINITION FILE]\n\n[BONES START]'
+			output = "[HAVOK SKELETON DEFINITION FILE]\n\n[BONES START]"
 			for bone in bones:
 				output += "\n"+str(bone)
 
 			output += "\n[END]"
 
-			with open(file.replace('.xml', '.txt').replace('.XML', '.TXT'), 'w') as newFile:
+			with open(file.replace(".xml", ".txt").replace(".XML", ".TXT"), "w") as newFile:
 				newFile.write(output)
 
 			self.pb.setValue(i+1)
@@ -252,5 +252,5 @@ def main():
 	form.show()
 	app.exec_()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 	main()
