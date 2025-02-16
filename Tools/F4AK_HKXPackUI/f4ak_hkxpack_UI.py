@@ -1,9 +1,9 @@
-import sys
 import os
-from PySide import QtGui, QtCore
 import subprocess
-from bs4 import BeautifulSoup
+import sys
 
+from bs4 import BeautifulSoup
+from PySide import QtCore, QtGui
 
 rp = os.path.dirname(os.path.realpath(__file__))
 hkxCliJar = os.path.join(rp, 'hkxpack-cli.jar')
