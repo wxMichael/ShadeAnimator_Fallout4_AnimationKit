@@ -32,20 +32,20 @@ class TestListView(QtWidgets.QListWidget):
 		self.setIconSize(QtCore.QSize(72, 72))
 
 	def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
-		if event.mimeData().hasUrls:
+		if event.mimeData().hasUrls():
 			event.accept()
 		else:
 			event.ignore()
 
 	def dragMoveEvent(self, event: QtGui.QDragMoveEvent) -> None:
-		if event.mimeData().hasUrls:
+		if event.mimeData().hasUrls():
 			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
 		else:
 			event.ignore()
 
 	def dropEvent(self, event: QtGui.QDropEvent) -> None:
-		if event.mimeData().hasUrls:
+		if event.mimeData().hasUrls():
 			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
 			links: list[str] = []
