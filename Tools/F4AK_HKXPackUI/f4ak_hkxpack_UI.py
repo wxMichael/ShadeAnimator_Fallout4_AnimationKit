@@ -223,7 +223,7 @@ class MainForm(QtGui.QMainWindow):
 			for child in skeleton.contents:
 				childSoup = BeautifulSoup(str(child), "xml")
 				boneNameParam = childSoup.find("hkparam", {"name":"name"})
-				if boneNameParam != None:
+				if boneNameParam is not None:
 					bone = str(boneNameParam).split('"name">')[1].split("</hkparam>")[0]
 					bones.append(bone)
 
