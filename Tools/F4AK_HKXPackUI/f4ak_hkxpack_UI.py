@@ -23,7 +23,7 @@ class TestListView(QtWidgets.QListWidget):
 	fileDropped = QtCore.Signal(list)
 
 	def __init__(self, type, parent=None):
-		super(TestListView, self).__init__(parent)
+		super().__init__(parent)
 		self.setAcceptDrops(True)
 		self.setIconSize(QtCore.QSize(72, 72))
 
@@ -53,7 +53,7 @@ class TestListView(QtWidgets.QListWidget):
 
 class inputBoxWithBrowse(QtWidgets.QWidget):
 	def __init__(self, parent=None, label="", placeholderText="", defaultPath = ""):
-		super(inputBoxWithBrowse, self).__init__(parent)
+		super().__init__(parent)
 		self.placeholderText = placeholderText
 		self.mainLayout = QtWidgets.QHBoxLayout()
 		self.setLayout(self.mainLayout)
@@ -79,7 +79,7 @@ class inputBoxWithBrowse(QtWidgets.QWidget):
 
 class MainForm(QtWidgets.QMainWindow):
 	def __init__(self, parent=None):
-		super(MainForm, self).__init__(parent)
+		super().__init__(parent)
 
 		self.mainWidget = QtWidgets.QWidget()
 		self.mainLayout = QtWidgets.QVBoxLayout()
