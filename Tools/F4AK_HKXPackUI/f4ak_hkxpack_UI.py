@@ -5,7 +5,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from PySide6 import QtCore, QtGui, QtWidgets
 
-real_path = Path(__file__).resolve().parent
+real_path = Path(sys.executable).parent if getattr(sys, "frozen", False) else Path(__file__).resolve().parent
 hkxCliJar = real_path / "hkxpack-cli.jar"
 havokToFbx = real_path / "havok2fbx.exe"
 
