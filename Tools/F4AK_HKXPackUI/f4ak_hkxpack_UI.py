@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 from bs4 import BeautifulSoup
-from PySide6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtGui, QtWidgets
 
 rp = os.path.dirname(os.path.realpath(__file__))
 hkxCliJar = os.path.join(rp, "hkxpack-cli.jar")
@@ -22,29 +22,29 @@ class TestListView(QtWidgets.QListWidget):
 
 	fileDropped = QtCore.Signal(list)
 
-	def __init__(self, parent=None) -> None:
+	def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
 		super().__init__(parent)
 		self.setAcceptDrops(True)
 		self.setIconSize(QtCore.QSize(72, 72))
 
-	def dragEnterEvent(self, event) -> None:
+	def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
 		if event.mimeData().hasUrls:
 			event.accept()
 		else:
 			event.ignore()
 
-	def dragMoveEvent(self, event) -> None:
+	def dragMoveEvent(self, event: QtGui.QDragMoveEvent) -> None:
 		if event.mimeData().hasUrls:
 			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
 		else:
 			event.ignore()
 
-	def dropEvent(self, event) -> None:
+	def dropEvent(self, event: QtGui.QDropEvent) -> None:
 		if event.mimeData().hasUrls:
 			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
-			links = []
+			links: list[str] = []
 			for url in event.mimeData().urls():
 				links.append(str(url.toLocalFile()))
 			self.fileDropped.emit(links)
@@ -52,7 +52,7 @@ class TestListView(QtWidgets.QListWidget):
 			event.ignore()
 
 class inputBoxWithBrowse(QtWidgets.QWidget):
-	def __init__(self, parent=None, label="", placeholderText="", defaultPath = "") -> None:
+	def __init__(self, parent: QtWidgets.QWidget | None = None, label: str="", placeholderText: str="", defaultPath: str="") -> None:
 		super().__init__(parent)
 		self.placeholderText = placeholderText
 		self.mainLayout = QtWidgets.QHBoxLayout()
@@ -78,7 +78,7 @@ class inputBoxWithBrowse(QtWidgets.QWidget):
 		self.lineEdit.setText(str(fileName[0]))
 
 class MainForm(QtWidgets.QMainWindow):
-	def __init__(self, parent=None) -> None:
+	def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
 		super().__init__(parent)
 
 		self.mainWidget = QtWidgets.QWidget()
@@ -157,7 +157,7 @@ class MainForm(QtWidgets.QMainWindow):
 
 		self.setStyleSheet(css)
 
-	def fileDropped(self, l) -> None:
+	def fileDropped(self, l: list[str]) -> None:
 		for url in l:
 			if os.path.exists(url):
 				item = QtWidgets.QListWidgetItem(url, self.view)
@@ -219,7 +219,7 @@ class MainForm(QtWidgets.QMainWindow):
 				soup = BeautifulSoup(fileData.read(), "xml")
 
 			skeleton = soup.find("hkparam", {"name":"bones"})
-			bones = []
+			bones: list[str] = []
 			for child in skeleton.contents:
 				childSoup = BeautifulSoup(str(child), "xml")
 				boneNameParam = childSoup.find("hkparam", {"name":"name"})
