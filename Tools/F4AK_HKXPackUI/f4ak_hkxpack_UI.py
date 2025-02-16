@@ -173,7 +173,7 @@ class MainForm(QtWidgets.QMainWindow):
 			#fileExtension = file.split('.')[-1]
 			print(file, fileRaw, fileExtension)
 
-			if fileExtension == ".hkx" or fileExtension == ".HKX":
+			if fileExtension in {".hkx", ".HKX"}:
 				fileto = fileRaw+".fbx"
 				print("Converting", file, "to", fileto)
 				subprocess.call([havokToFbx, "-hk_skeleton", skeleton, "-hk_anim", file, "-fbx" , fileto])
@@ -187,11 +187,11 @@ class MainForm(QtWidgets.QMainWindow):
 			file = self.view.item(i).text()
 			fileExtension = file.split(".")[-1]
 
-			if fileExtension == "hkx" or fileExtension == "HKX":
+			if fileExtension in {"hkx", "HKX"}:
 				print(">>> Converting", file, "to xml")
 				subprocess.call(["java", "-jar", hkxCliJar, "unpack", file])
 
-			elif fileExtension == "xml" or fileExtension == "XML":
+			elif fileExtension in {"xml", "XML"}:
 				print("<<< Converting", file, "to hkx")
 				subprocess.call(["java", "-jar", hkxCliJar, "pack", file])
 
@@ -208,7 +208,7 @@ class MainForm(QtWidgets.QMainWindow):
 			fileExtension = file.split(".")[-1]
 
 			#if the file is hkx, we need to convert it to xml first.
-			if fileExtension == "hkx" or fileExtension == "HKX":
+			if fileExtension in {"hkx", "HKX"}:
 				print(">>> Converting", file, "to xml")
 				subprocess.call(["java", "-jar", hkxCliJar, "unpack", file])
 				file = file.replace(".hkx", ".xml").replace(".HKX", ".XML")
