@@ -7,9 +7,13 @@ from bs4 import BeautifulSoup
 
 rp = os.path.dirname(os.path.realpath(__file__))
 hkxCliJar = os.path.join(rp, 'hkxpack-cli.jar')
+havokToFbx = os.path.join(rp, 'havok2fbx.exe')
 
 if os.path.exists(hkxCliJar) != True:
     print "ERROR! Could not find hkxpack-cli.jar file. You need to drop this gui file in the same folder as hkxpack-cli.jar file! Otherwise it won't work."
+
+if os.path.exists(havokToFbx) != True:
+    print "ERROR! Could not find havok2fbx.exe file. You need to drop this gui file in the same folder as havok2fbx.exe file! Otherwise it won't work. Or you can drop all havok2fbx.exe files into the folder with this gui."
 
 css = '''
 '''
@@ -47,6 +51,32 @@ class TestListView(QtGui.QListWidget):
         else:
             event.ignore()
 
+class inputBoxWithBrowse(QtGui.QWidget):
+    def __init__(self, parent=None, label='', placeholderText='', defaultPath = ''):
+        super(inputBoxWithBrowse, self).__init__(parent)
+        self.placeholderText = placeholderText
+        self.mainLayout = QtGui.QHBoxLayout()
+        self.setLayout(self.mainLayout)
+
+        self.lineEdit = QtGui.QLineEdit()
+        self.lineEdit.setPlaceholderText(placeholderText)
+        self.lineEdit.setText(defaultPath)
+
+        self.browseBtn = QtGui.QPushButton("Browse")
+        self.browseBtn.clicked.connect(self.browse)
+        self.label = QtGui.QLabel(label)
+
+        self.mainLayout.addWidget(self.label)
+        self.mainLayout.addWidget(self.lineEdit)
+        self.mainLayout.addWidget(self.browseBtn)
+
+    def text(self):
+        return self.lineEdit.text()
+
+    def browse(self):
+        fileName = QtGui.QFileDialog.getOpenFileName(self, caption=self.placeholderText, filter='*.hkx')
+        self.lineEdit.setText(str(fileName[0]))
+
 class MainForm(QtGui.QMainWindow):
     def __init__(self, parent=None):
         super(MainForm, self).__init__(parent)
@@ -79,17 +109,31 @@ class MainForm(QtGui.QMainWindow):
         #endregion
         self.pb = QtGui.QProgressBar()
 
-        self.button = QtGui.QPushButton("Process")
+        self.button = QtGui.QPushButton("HKX <=> XML")
         self.button.clicked.connect(self.convertXmlHkx)
+        self.button.setToolTip("Convert HKX to XML and XML to HKX")
 
-        self.getTxtButton = QtGui.QPushButton("Generate Rig TXT from skeleton.hkx\\xml")
+        self.getTxtButton = QtGui.QPushButton("Generate rig.txt from skeleton.hkx")
         self.getTxtButton.clicked.connect(self.generateRigTxt)
+        self.getTxtButton.setToolTip("Given a skeleton.hkx or skeleton.xml file it will generate rig.txt for that skeleton.")
 
         self.remove = QtGui.QPushButton("Remove selected")
         self.remove.clicked.connect(self.removeSelected)
 
         self.clear = QtGui.QPushButton("Clear view")
         self.clear.clicked.connect(self.clearView)
+
+        self.hkxToFbxGrp = QtGui.QGroupBox("HKX (32bit) => FBX")
+
+        self.skeletonInput = inputBoxWithBrowse(label="skeleton.hkx", placeholderText="Locate skeleton.hkx file", defaultPath=os.path.join(rp, 'skeleton.hkx'))
+        self.hkxToFbxBtn = QtGui.QPushButton("Convert HKX to FBX")
+        self.hkxToFbxBtn.clicked.connect(self.convertHkxToFBXAnimation)
+
+        self.hkxToFbxLayout = QtGui.QVBoxLayout()
+        self.hkxToFbxLayout.addWidget(self.skeletonInput)
+        self.hkxToFbxLayout.addWidget(self.hkxToFbxBtn)
+
+        self.hkxToFbxGrp.setLayout(self.hkxToFbxLayout)
 
         self.mainLayout.addWidget(self.viewlabel)
         self.mainLayout.addWidget(self.view)
@@ -98,12 +142,18 @@ class MainForm(QtGui.QMainWindow):
         self.mainLayout.addWidget(self.getTxtButton)
         self.mainLayout.addWidget(self.remove)
         self.mainLayout.addWidget(self.clear)
+        self.mainLayout.addWidget(self.hkxToFbxGrp)
         self.mainLayout.addWidget(self.pb)
 
         self.setCentralWidget(self.mainWidget)
 
         self.setWindowTitle("hkxpack GUI")
+        if os.path.exists(hkxCliJar) != True:
+            self.button.setEnabled(False)
+            self.getTxtButton.setEnabled(False)
 
+        if os.path.exists(havokToFbx) != True:
+            self.hkxToFbxGrp.setEnabled(False)
 
         self.setStyleSheet(css)
 
@@ -112,6 +162,23 @@ class MainForm(QtGui.QMainWindow):
             if os.path.exists(url):
                 item = QtGui.QListWidgetItem(url, self.view)
                 item.setStatusTip(url)
+
+    def convertHkxToFBXAnimation(self):
+        skeleton = self.skeletonInput.text()
+        self.pb.setMaximum(self.view.count())
+        self.pb.setValue(0)
+        for i in range (self.view.count()):
+            file = self.view.item(i).text()
+            fileRaw, fileExtension = os.path.splitext(file)
+            #fileExtension = file.split('.')[-1]
+            print file, fileRaw, fileExtension
+
+            if fileExtension == ".hkx" or fileExtension == ".HKX":
+                fileto = fileRaw+'.fbx'
+                print "Converting", file, "to", fileto
+                subprocess.call([havokToFbx, '-hk_skeleton', skeleton, '-hk_anim', file, '-fbx' , fileto])
+            self.pb.setValue(i+1)
+        print "Done"
 
     def convertXmlHkx (self, action = 'pack'):
         self.pb.setMaximum(self.view.count())
