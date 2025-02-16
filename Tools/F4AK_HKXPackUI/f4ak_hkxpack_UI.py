@@ -10,16 +10,20 @@ hkxCliJar = os.path.join(rp, "hkxpack-cli.jar")
 havokToFbx = os.path.join(rp, "havok2fbx.exe")
 
 if not os.path.exists(hkxCliJar):
-	print("ERROR! Could not find hkxpack-cli.jar file. You need to drop this gui file in the same folder as hkxpack-cli.jar file! Otherwise it won't work.")
+	print(
+		"ERROR! Could not find hkxpack-cli.jar file. You need to drop this gui file in the same folder as hkxpack-cli.jar file! Otherwise it won't work.",
+	)
 
 if not os.path.exists(havokToFbx):
-	print("ERROR! Could not find havok2fbx.exe file. You need to drop this gui file in the same folder as havok2fbx.exe file! Otherwise it won't work. Or you can drop all havok2fbx.exe files into the folder with this gui.")
+	print(
+		"ERROR! Could not find havok2fbx.exe file. You need to drop this gui file in the same folder as havok2fbx.exe file! Otherwise it won't work. Or you can drop all havok2fbx.exe files into the folder with this gui.",
+	)
 
 css = """
 """
 
-class TestListView(QtWidgets.QListWidget):
 
+class TestListView(QtWidgets.QListWidget):
 	fileDropped = QtCore.Signal(list)
 
 	def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
@@ -51,8 +55,15 @@ class TestListView(QtWidgets.QListWidget):
 		else:
 			event.ignore()
 
+
 class inputBoxWithBrowse(QtWidgets.QWidget):
-	def __init__(self, parent: QtWidgets.QWidget | None = None, label: str="", placeholderText: str="", defaultPath: str="") -> None:
+	def __init__(
+		self,
+		parent: QtWidgets.QWidget | None = None,
+		label: str = "",
+		placeholderText: str = "",
+		defaultPath: str = "",
+	) -> None:
 		super().__init__(parent)
 		self.placeholderText = placeholderText
 		self.mainLayout = QtWidgets.QHBoxLayout()
@@ -77,6 +88,7 @@ class inputBoxWithBrowse(QtWidgets.QWidget):
 		fileName = QtWidgets.QFileDialog.getOpenFileName(self, caption=self.placeholderText, filter="*.hkx")
 		self.lineEdit.setText(str(fileName[0]))
 
+
 class MainForm(QtWidgets.QMainWindow):
 	def __init__(self, parent: QtWidgets.QWidget | None = None) -> None:
 		super().__init__(parent)
@@ -92,7 +104,7 @@ class MainForm(QtWidgets.QMainWindow):
 
 		self.viewlabel = QtWidgets.QLabel("Drag and drop files here:")
 
-		#region Pack Unpack Groupbox
+		# region Pack Unpack Groupbox
 		self.groupBox = QtWidgets.QGroupBox("Action")
 
 		self.unpackRB = QtWidgets.QRadioButton("&Unpack")
@@ -100,13 +112,12 @@ class MainForm(QtWidgets.QMainWindow):
 
 		self.unpackRB.setChecked(True)
 
-
 		vbox = QtWidgets.QVBoxLayout()
 		vbox.addWidget(self.unpackRB)
 		vbox.addWidget(self.packRB)
 		vbox.addStretch(1)
 		self.groupBox.setLayout(vbox)
-		#endregion
+		# endregion
 		self.pb = QtWidgets.QProgressBar()
 
 		self.button = QtWidgets.QPushButton("HKX <=> XML")
@@ -125,7 +136,11 @@ class MainForm(QtWidgets.QMainWindow):
 
 		self.hkxToFbxGrp = QtWidgets.QGroupBox("HKX (32bit) => FBX")
 
-		self.skeletonInput = inputBoxWithBrowse(label="skeleton.hkx", placeholderText="Locate skeleton.hkx file", defaultPath=os.path.join(rp, "skeleton.hkx"))
+		self.skeletonInput = inputBoxWithBrowse(
+			label="skeleton.hkx",
+			placeholderText="Locate skeleton.hkx file",
+			defaultPath=os.path.join(rp, "skeleton.hkx"),
+		)
 		self.hkxToFbxBtn = QtWidgets.QPushButton("Convert HKX to FBX")
 		self.hkxToFbxBtn.clicked.connect(self.convertHkxToFBXAnimation)
 
@@ -137,7 +152,7 @@ class MainForm(QtWidgets.QMainWindow):
 
 		self.mainLayout.addWidget(self.viewlabel)
 		self.mainLayout.addWidget(self.view)
-		#self.mainLayout.addWidget(self.groupBox)
+		# self.mainLayout.addWidget(self.groupBox)
 		self.mainLayout.addWidget(self.button)
 		self.mainLayout.addWidget(self.getTxtButton)
 		self.mainLayout.addWidget(self.remove)
@@ -167,23 +182,23 @@ class MainForm(QtWidgets.QMainWindow):
 		skeleton = self.skeletonInput.text()
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
-		for i in range (self.view.count()):
+		for i in range(self.view.count()):
 			file = self.view.item(i).text()
 			fileRaw, fileExtension = os.path.splitext(file)
-			#fileExtension = file.split('.')[-1]
+			# fileExtension = file.split('.')[-1]
 			print(file, fileRaw, fileExtension)
 
 			if fileExtension in {".hkx", ".HKX"}:
-				fileto = fileRaw+".fbx"
+				fileto = fileRaw + ".fbx"
 				print("Converting", file, "to", fileto)
-				subprocess.call([havokToFbx, "-hk_skeleton", skeleton, "-hk_anim", file, "-fbx" , fileto])
-			self.pb.setValue(i+1)
+				subprocess.call([havokToFbx, "-hk_skeleton", skeleton, "-hk_anim", file, "-fbx", fileto])
+			self.pb.setValue(i + 1)
 		print("Done")
 
-	def convertXmlHkx (self) -> None:
+	def convertXmlHkx(self) -> None:
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
-		for i in range (self.view.count()):
+		for i in range(self.view.count()):
 			file = self.view.item(i).text()
 			fileExtension = file.split(".")[-1]
 
@@ -198,46 +213,46 @@ class MainForm(QtWidgets.QMainWindow):
 			else:
 				print("File", file, "is not hkx or xml. Skipped.")
 
-			self.pb.setValue(i+1)
+			self.pb.setValue(i + 1)
 
 	def generateRigTxt(self) -> None:
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
-		for i in range (self.view.count()):
+		for i in range(self.view.count()):
 			file = self.view.item(i).text()
 			fileExtension = file.split(".")[-1]
 
-			#if the file is hkx, we need to convert it to xml first.
+			# if the file is hkx, we need to convert it to xml first.
 			if fileExtension in {"hkx", "HKX"}:
 				print(">>> Converting", file, "to xml")
 				subprocess.call(["java", "-jar", hkxCliJar, "unpack", file])
 				file = file.replace(".hkx", ".xml").replace(".HKX", ".XML")
 
-			#read xml and extract data
+			# read xml and extract data
 			print("Reading file...")
 			with open(file, "r") as fileData:
 				soup = BeautifulSoup(fileData.read(), "xml")
 
-			skeleton = soup.find("hkparam", {"name":"bones"})
+			skeleton = soup.find("hkparam", {"name": "bones"})
 			bones: list[str] = []
 			for child in skeleton.contents:
 				childSoup = BeautifulSoup(str(child), "xml")
-				boneNameParam = childSoup.find("hkparam", {"name":"name"})
+				boneNameParam = childSoup.find("hkparam", {"name": "name"})
 				if boneNameParam is not None:
 					bone = str(boneNameParam).split('"name">')[1].split("</hkparam>")[0]
 					bones.append(bone)
 
-			#generate txt
+			# generate txt
 			output = "[HAVOK SKELETON DEFINITION FILE]\n\n[BONES START]"
 			for bone in bones:
-				output += "\n"+str(bone)
+				output += "\n" + str(bone)
 
 			output += "\n[END]"
 
 			with open(file.replace(".xml", ".txt").replace(".XML", ".TXT"), "w") as newFile:
 				newFile.write(output)
 
-			self.pb.setValue(i+1)
+			self.pb.setValue(i + 1)
 
 	def clearView(self) -> None:
 		self.view.clear()
@@ -246,11 +261,13 @@ class MainForm(QtWidgets.QMainWindow):
 		for item in self.view.selectedItems():
 			self.view.takeItem(self.view.row(item))
 
+
 def main() -> None:
 	app = QtWidgets.QApplication(sys.argv)
 	form = MainForm()
 	form.show()
 	app.exec_()
+
 
 if __name__ == "__main__":
 	main()
