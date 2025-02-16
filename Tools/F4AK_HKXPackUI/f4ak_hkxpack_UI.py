@@ -188,7 +188,7 @@ class MainForm(QtWidgets.QMainWindow):
 			if fileExtension == ".hkx":
 				output_path = file_path.with_suffix(".fbx")
 				print(f"Converting {file_path} to {output_path}")
-				subprocess.call([havokToFbx, "-hk_skeleton", skeleton, "-hk_anim", str(file_path), "-fbx", str(output_path)])
+				subprocess.call([str(havokToFbx), "-hk_skeleton", skeleton, "-hk_anim", str(file_path), "-fbx", str(output_path)])
 			self.pb.setValue(i + 1)
 		print("Done")
 
@@ -201,11 +201,11 @@ class MainForm(QtWidgets.QMainWindow):
 
 			if fileExtension == ".hkx":
 				print(f">>> Converting {file_path} to xml")
-				subprocess.call(["java", "-jar", hkxCliJar, "unpack", str(file_path)])
+				subprocess.call(["java", "-jar", str(hkxCliJar), "unpack", str(file_path)])
 
 			elif fileExtension == ".xml":
 				print(f"<<< Converting {file_path} to hkx")
-				subprocess.call(["java", "-jar", hkxCliJar, "pack", str(file_path)])
+				subprocess.call(["java", "-jar", str(hkxCliJar), "pack", str(file_path)])
 
 			else:
 				print(f"File {file_path} is not hkx or xml. Skipped.")
