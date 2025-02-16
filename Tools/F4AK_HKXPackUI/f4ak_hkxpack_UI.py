@@ -22,7 +22,7 @@ class TestListView(QtWidgets.QListWidget):
 
 	fileDropped = QtCore.Signal(list)
 
-	def __init__(self, type, parent=None) -> None:
+	def __init__(self, parent=None) -> None:
 		super().__init__(parent)
 		self.setAcceptDrops(True)
 		self.setIconSize(QtCore.QSize(72, 72))
@@ -180,7 +180,7 @@ class MainForm(QtWidgets.QMainWindow):
 			self.pb.setValue(i+1)
 		print("Done")
 
-	def convertXmlHkx (self, action = "pack") -> None:
+	def convertXmlHkx (self) -> None:
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
 		for i in range (self.view.count()):
