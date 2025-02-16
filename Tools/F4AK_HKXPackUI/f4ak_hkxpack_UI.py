@@ -22,25 +22,25 @@ class TestListView(QtWidgets.QListWidget):
 
 	fileDropped = QtCore.Signal(list)
 
-	def __init__(self, type, parent=None):
+	def __init__(self, type, parent=None) -> None:
 		super().__init__(parent)
 		self.setAcceptDrops(True)
 		self.setIconSize(QtCore.QSize(72, 72))
 
-	def dragEnterEvent(self, event):
+	def dragEnterEvent(self, event) -> None:
 		if event.mimeData().hasUrls:
 			event.accept()
 		else:
 			event.ignore()
 
-	def dragMoveEvent(self, event):
+	def dragMoveEvent(self, event) -> None:
 		if event.mimeData().hasUrls:
 			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
 		else:
 			event.ignore()
 
-	def dropEvent(self, event):
+	def dropEvent(self, event) -> None:
 		if event.mimeData().hasUrls:
 			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
@@ -52,7 +52,7 @@ class TestListView(QtWidgets.QListWidget):
 			event.ignore()
 
 class inputBoxWithBrowse(QtWidgets.QWidget):
-	def __init__(self, parent=None, label="", placeholderText="", defaultPath = ""):
+	def __init__(self, parent=None, label="", placeholderText="", defaultPath = "") -> None:
 		super().__init__(parent)
 		self.placeholderText = placeholderText
 		self.mainLayout = QtWidgets.QHBoxLayout()
@@ -70,15 +70,15 @@ class inputBoxWithBrowse(QtWidgets.QWidget):
 		self.mainLayout.addWidget(self.lineEdit)
 		self.mainLayout.addWidget(self.browseBtn)
 
-	def text(self):
+	def text(self) -> str:
 		return self.lineEdit.text()
 
-	def browse(self):
+	def browse(self) -> None:
 		fileName = QtWidgets.QFileDialog.getOpenFileName(self, caption=self.placeholderText, filter="*.hkx")
 		self.lineEdit.setText(str(fileName[0]))
 
 class MainForm(QtWidgets.QMainWindow):
-	def __init__(self, parent=None):
+	def __init__(self, parent=None) -> None:
 		super().__init__(parent)
 
 		self.mainWidget = QtWidgets.QWidget()
@@ -157,13 +157,13 @@ class MainForm(QtWidgets.QMainWindow):
 
 		self.setStyleSheet(css)
 
-	def fileDropped(self, l):
+	def fileDropped(self, l) -> None:
 		for url in l:
 			if os.path.exists(url):
 				item = QtWidgets.QListWidgetItem(url, self.view)
 				item.setStatusTip(url)
 
-	def convertHkxToFBXAnimation(self):
+	def convertHkxToFBXAnimation(self) -> None:
 		skeleton = self.skeletonInput.text()
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
@@ -180,7 +180,7 @@ class MainForm(QtWidgets.QMainWindow):
 			self.pb.setValue(i+1)
 		print("Done")
 
-	def convertXmlHkx (self, action = "pack"):
+	def convertXmlHkx (self, action = "pack") -> None:
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
 		for i in range (self.view.count()):
@@ -200,7 +200,7 @@ class MainForm(QtWidgets.QMainWindow):
 
 			self.pb.setValue(i+1)
 
-	def generateRigTxt(self):
+	def generateRigTxt(self) -> None:
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
 		for i in range (self.view.count()):
@@ -239,14 +239,14 @@ class MainForm(QtWidgets.QMainWindow):
 
 			self.pb.setValue(i+1)
 
-	def clearView(self):
+	def clearView(self) -> None:
 		self.view.clear()
 
-	def removeSelected(self):
+	def removeSelected(self) -> None:
 		for item in self.view.selectedItems():
 			self.view.takeItem(self.view.row(item))
 
-def main():
+def main() -> None:
 	app = QtWidgets.QApplication(sys.argv)
 	form = MainForm()
 	form.show()
