@@ -240,11 +240,7 @@ class MainForm(QtWidgets.QMainWindow):
 					bones.append(bone)
 
 			# generate txt
-			output = "[HAVOK SKELETON DEFINITION FILE]\n\n[BONES START]"
-			for bone in bones:
-				output += "\n" + str(bone)
-
-			output += "\n[END]"
+			output = f"[HAVOK SKELETON DEFINITION FILE]\n\n[BONES START]\n{'\n'.join(bones)}\n[END]"
 
 			with file_path.with_suffix(".txt").open("w") as newFile:
 				newFile.write(output)
