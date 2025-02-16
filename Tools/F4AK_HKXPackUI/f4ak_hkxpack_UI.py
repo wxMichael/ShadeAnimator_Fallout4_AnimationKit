@@ -9,10 +9,10 @@ rp = os.path.dirname(os.path.realpath(__file__))
 hkxCliJar = os.path.join(rp, "hkxpack-cli.jar")
 havokToFbx = os.path.join(rp, "havok2fbx.exe")
 
-if os.path.exists(hkxCliJar) != True:
+if not os.path.exists(hkxCliJar):
 	print("ERROR! Could not find hkxpack-cli.jar file. You need to drop this gui file in the same folder as hkxpack-cli.jar file! Otherwise it won't work.")
 
-if os.path.exists(havokToFbx) != True:
+if not os.path.exists(havokToFbx):
 	print("ERROR! Could not find havok2fbx.exe file. You need to drop this gui file in the same folder as havok2fbx.exe file! Otherwise it won't work. Or you can drop all havok2fbx.exe files into the folder with this gui.")
 
 css = """
@@ -148,11 +148,11 @@ class MainForm(QtGui.QMainWindow):
 		self.setCentralWidget(self.mainWidget)
 
 		self.setWindowTitle("hkxpack GUI")
-		if os.path.exists(hkxCliJar) != True:
+		if not os.path.exists(hkxCliJar):
 			self.button.setEnabled(False)
 			self.getTxtButton.setEnabled(False)
 
-		if os.path.exists(havokToFbx) != True:
+		if not os.path.exists(havokToFbx):
 			self.hkxToFbxGrp.setEnabled(False)
 
 		self.setStyleSheet(css)
