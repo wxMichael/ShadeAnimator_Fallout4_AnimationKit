@@ -1,20 +1,21 @@
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 from bs4 import BeautifulSoup
 from PySide6 import QtCore, QtGui, QtWidgets
 
-real_path = os.path.dirname(os.path.realpath(__file__))
-hkxCliJar = os.path.join(real_path, "hkxpack-cli.jar")
-havokToFbx = os.path.join(real_path, "havok2fbx.exe")
+real_path = Path(__file__).resolve().parent
+hkxCliJar = real_path / "hkxpack-cli.jar"
+havokToFbx = real_path / "havok2fbx.exe"
 
-if not os.path.exists(hkxCliJar):
+if not hkxCliJar.is_file():
 	print(
 		"ERROR! Could not find hkxpack-cli.jar file. You need to drop this gui file in the same folder as hkxpack-cli.jar file! Otherwise it won't work.",
 	)
 
-if not os.path.exists(havokToFbx):
+if not havokToFbx.is_file():
 	print(
 		"ERROR! Could not find havok2fbx.exe file. You need to drop this gui file in the same folder as havok2fbx.exe file! Otherwise it won't work. Or you can drop all havok2fbx.exe files into the folder with this gui.",
 	)
@@ -137,7 +138,7 @@ class MainForm(QtWidgets.QMainWindow):
 		self.skeletonInput = inputBoxWithBrowse(
 			label="skeleton.hkx",
 			placeholderText="Locate skeleton.hkx file",
-			defaultPath=os.path.join(real_path, "skeleton.hkx"),
+			defaultPath=str(real_path / "skeleton.hkx"),
 		)
 		self.hkxToFbxBtn = QtWidgets.QPushButton("Convert HKX to FBX")
 		self.hkxToFbxBtn.clicked.connect(self.convertHkxToFBXAnimation)
@@ -161,18 +162,18 @@ class MainForm(QtWidgets.QMainWindow):
 		self.setCentralWidget(self.mainWidget)
 
 		self.setWindowTitle("hkxpack GUI")
-		if not os.path.exists(hkxCliJar):
+		if not hkxCliJar.is_file():
 			self.button.setEnabled(False)
 			self.getTxtButton.setEnabled(False)
 
-		if not os.path.exists(havokToFbx):
+		if not havokToFbx.is_file():
 			self.hkxToFbxGrp.setEnabled(False)
 
 		self.setStyleSheet(css)
 
 	def fileDropped(self, files: list[str]) -> None:
 		for file in files:
-			if os.path.exists(file):
+			if Path(file).is_file():
 				item = QtWidgets.QListWidgetItem(file, self.view)
 				item.setStatusTip(file)
 
@@ -181,15 +182,14 @@ class MainForm(QtWidgets.QMainWindow):
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
 		for i in range(self.view.count()):
-			file = self.view.item(i).text()
-			fileRaw, fileExtension = os.path.splitext(file)
-			# fileExtension = file.split('.')[-1]
-			print(file, fileRaw, fileExtension)
+			file_path = Path(self.view.item(i).text())
+			fileExtension = file_path.suffix.lower()
+			print(str(file_path), file_path.stem, fileExtension)
 
-			if fileExtension in {".hkx", ".HKX"}:
-				fileto = fileRaw + ".fbx"
-				print("Converting", file, "to", fileto)
-				subprocess.call([havokToFbx, "-hk_skeleton", skeleton, "-hk_anim", file, "-fbx", fileto])
+			if fileExtension == ".hkx":
+				output_path = file_path.with_suffix(".fbx")
+				print("Converting", str(file_path), "to", str(output_path))
+				subprocess.call([havokToFbx, "-hk_skeleton", skeleton, "-hk_anim", str(file_path), "-fbx", str(output_path)])
 			self.pb.setValue(i + 1)
 		print("Done")
 
@@ -197,19 +197,19 @@ class MainForm(QtWidgets.QMainWindow):
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
 		for i in range(self.view.count()):
-			file = self.view.item(i).text()
-			fileExtension = file.split(".")[-1]
+			file_path = Path(self.view.item(i).text())
+			fileExtension = file_path.suffix.lower()
 
-			if fileExtension in {"hkx", "HKX"}:
-				print(">>> Converting", file, "to xml")
-				subprocess.call(["java", "-jar", hkxCliJar, "unpack", file])
+			if fileExtension == ".hkx":
+				print(">>> Converting", str(file_path), "to xml")
+				subprocess.call(["java", "-jar", hkxCliJar, "unpack", str(file_path)])
 
-			elif fileExtension in {"xml", "XML"}:
-				print("<<< Converting", file, "to hkx")
-				subprocess.call(["java", "-jar", hkxCliJar, "pack", file])
+			elif fileExtension == ".xml":
+				print("<<< Converting", str(file_path), "to hkx")
+				subprocess.call(["java", "-jar", hkxCliJar, "pack", str(file_path)])
 
 			else:
-				print("File", file, "is not hkx or xml. Skipped.")
+				print("File", file_path, "is not hkx or xml. Skipped.")
 
 			self.pb.setValue(i + 1)
 
@@ -217,18 +217,17 @@ class MainForm(QtWidgets.QMainWindow):
 		self.pb.setMaximum(self.view.count())
 		self.pb.setValue(0)
 		for i in range(self.view.count()):
-			file = self.view.item(i).text()
-			fileExtension = file.split(".")[-1]
+			file_path = Path(self.view.item(i).text())
 
 			# if the file is hkx, we need to convert it to xml first.
-			if fileExtension in {"hkx", "HKX"}:
-				print(">>> Converting", file, "to xml")
-				subprocess.call(["java", "-jar", hkxCliJar, "unpack", file])
-				file = file.replace(".hkx", ".xml").replace(".HKX", ".XML")
+			if file_path.suffix == ".hkx":
+				print(">>> Converting", file_path, "to xml")
+				subprocess.call(["java", "-jar", str(hkxCliJar), "unpack", str(file_path)])
+				file_path = file_path.with_suffix(".xml")
 
 			# read xml and extract data
 			print("Reading file...")
-			with open(file, "r") as fileData:
+			with file_path.open() as fileData:
 				soup = BeautifulSoup(fileData.read(), "xml")
 
 			skeleton = soup.find("hkparam", {"name": "bones"})
@@ -247,7 +246,7 @@ class MainForm(QtWidgets.QMainWindow):
 
 			output += "\n[END]"
 
-			with open(file.replace(".xml", ".txt").replace(".XML", ".TXT"), "w") as newFile:
+			with file_path.with_suffix(".txt").open("w") as newFile:
 				newFile.write(output)
 
 			self.pb.setValue(i + 1)
