@@ -48,9 +48,7 @@ class TestListView(QtWidgets.QListWidget):
 		if event.mimeData().hasUrls():
 			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
-			links: list[str] = []
-			for url in event.mimeData().urls():
-				links.append(str(url.toLocalFile()))
+			links: list[str] = [str(url.toLocalFile()) for url in event.mimeData().urls()]
 			self.fileDropped.emit(links)
 		else:
 			event.ignore()
