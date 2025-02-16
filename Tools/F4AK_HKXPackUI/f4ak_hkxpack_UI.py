@@ -10,10 +10,10 @@ hkxCliJar = os.path.join(rp, 'hkxpack-cli.jar')
 havokToFbx = os.path.join(rp, 'havok2fbx.exe')
 
 if os.path.exists(hkxCliJar) != True:
-	print "ERROR! Could not find hkxpack-cli.jar file. You need to drop this gui file in the same folder as hkxpack-cli.jar file! Otherwise it won't work."
+	print("ERROR! Could not find hkxpack-cli.jar file. You need to drop this gui file in the same folder as hkxpack-cli.jar file! Otherwise it won't work.")
 
 if os.path.exists(havokToFbx) != True:
-	print "ERROR! Could not find havok2fbx.exe file. You need to drop this gui file in the same folder as havok2fbx.exe file! Otherwise it won't work. Or you can drop all havok2fbx.exe files into the folder with this gui."
+	print("ERROR! Could not find havok2fbx.exe file. You need to drop this gui file in the same folder as havok2fbx.exe file! Otherwise it won't work. Or you can drop all havok2fbx.exe files into the folder with this gui.")
 
 css = '''
 '''
@@ -171,14 +171,14 @@ class MainForm(QtGui.QMainWindow):
 			file = self.view.item(i).text()
 			fileRaw, fileExtension = os.path.splitext(file)
 			#fileExtension = file.split('.')[-1]
-			print file, fileRaw, fileExtension
+			print(file, fileRaw, fileExtension)
 
 			if fileExtension == ".hkx" or fileExtension == ".HKX":
 				fileto = fileRaw+'.fbx'
-				print "Converting", file, "to", fileto
+				print("Converting", file, "to", fileto)
 				subprocess.call([havokToFbx, '-hk_skeleton', skeleton, '-hk_anim', file, '-fbx' , fileto])
 			self.pb.setValue(i+1)
-		print "Done"
+		print("Done")
 
 	def convertXmlHkx (self, action = 'pack'):
 		self.pb.setMaximum(self.view.count())
@@ -188,15 +188,15 @@ class MainForm(QtGui.QMainWindow):
 			fileExtension = file.split('.')[-1]
 
 			if fileExtension == "hkx" or fileExtension == "HKX":
-				print ">>> Converting", file, "to xml"
+				print(">>> Converting", file, "to xml")
 				subprocess.call(['java', '-jar', hkxCliJar, 'unpack', file])
 
 			elif fileExtension == "xml" or fileExtension == "XML":
-				print "<<< Converting", file, "to hkx"
+				print("<<< Converting", file, "to hkx")
 				subprocess.call(['java', '-jar', hkxCliJar, 'pack', file])
 
 			else:
-				print "File", file, "is not hkx or xml. Skipped."
+				print("File", file, "is not hkx or xml. Skipped.")
 
 			self.pb.setValue(i+1)
 
@@ -209,12 +209,12 @@ class MainForm(QtGui.QMainWindow):
 
 			#if the file is hkx, we need to convert it to xml first.
 			if fileExtension == "hkx" or fileExtension == "HKX":
-				print ">>> Converting", file, "to xml"
+				print(">>> Converting", file, "to xml")
 				subprocess.call(['java', '-jar', hkxCliJar, 'unpack', file])
 				file = file.replace('.hkx', '.xml').replace('.HKX', '.XML')
 
 			#read xml and extract data
-			print "Reading file..."
+			print("Reading file...")
 			with open(file, 'r') as fileData:
 				soup = BeautifulSoup(fileData.read(), 'xml')
 
