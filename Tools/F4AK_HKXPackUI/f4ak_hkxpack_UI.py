@@ -258,7 +258,7 @@ def main() -> None:
 	app = QtWidgets.QApplication(sys.argv)
 	form = MainForm()
 	form.show()
-	app.exec_()
+	app.exec()
 
 
 if __name__ == "__main__":
