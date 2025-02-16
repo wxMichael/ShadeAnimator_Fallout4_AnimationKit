@@ -3,7 +3,7 @@ import subprocess
 import sys
 
 from bs4 import BeautifulSoup
-from PySide import QtCore, QtGui
+from PySide6 import QtCore, QtWidgets
 
 rp = os.path.dirname(os.path.realpath(__file__))
 hkxCliJar = os.path.join(rp, "hkxpack-cli.jar")
@@ -18,7 +18,7 @@ if not os.path.exists(havokToFbx):
 css = """
 """
 
-class TestListView(QtGui.QListWidget):
+class TestListView(QtWidgets.QListWidget):
 
 	fileDropped = QtCore.Signal(list)
 
@@ -35,14 +35,14 @@ class TestListView(QtGui.QListWidget):
 
 	def dragMoveEvent(self, event):
 		if event.mimeData().hasUrls:
-			event.setDropAction(QtCore.Qt.CopyAction)
+			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
 		else:
 			event.ignore()
 
 	def dropEvent(self, event):
 		if event.mimeData().hasUrls:
-			event.setDropAction(QtCore.Qt.CopyAction)
+			event.setDropAction(QtCore.Qt.DropAction.CopyAction)
 			event.accept()
 			links = []
 			for url in event.mimeData().urls():
@@ -51,20 +51,20 @@ class TestListView(QtGui.QListWidget):
 		else:
 			event.ignore()
 
-class inputBoxWithBrowse(QtGui.QWidget):
+class inputBoxWithBrowse(QtWidgets.QWidget):
 	def __init__(self, parent=None, label="", placeholderText="", defaultPath = ""):
 		super(inputBoxWithBrowse, self).__init__(parent)
 		self.placeholderText = placeholderText
-		self.mainLayout = QtGui.QHBoxLayout()
+		self.mainLayout = QtWidgets.QHBoxLayout()
 		self.setLayout(self.mainLayout)
 
-		self.lineEdit = QtGui.QLineEdit()
+		self.lineEdit = QtWidgets.QLineEdit()
 		self.lineEdit.setPlaceholderText(placeholderText)
 		self.lineEdit.setText(defaultPath)
 
-		self.browseBtn = QtGui.QPushButton("Browse")
+		self.browseBtn = QtWidgets.QPushButton("Browse")
 		self.browseBtn.clicked.connect(self.browse)
-		self.label = QtGui.QLabel(label)
+		self.label = QtWidgets.QLabel(label)
 
 		self.mainLayout.addWidget(self.label)
 		self.mainLayout.addWidget(self.lineEdit)
@@ -74,62 +74,62 @@ class inputBoxWithBrowse(QtGui.QWidget):
 		return self.lineEdit.text()
 
 	def browse(self):
-		fileName = QtGui.QFileDialog.getOpenFileName(self, caption=self.placeholderText, filter="*.hkx")
+		fileName = QtWidgets.QFileDialog.getOpenFileName(self, caption=self.placeholderText, filter="*.hkx")
 		self.lineEdit.setText(str(fileName[0]))
 
-class MainForm(QtGui.QMainWindow):
+class MainForm(QtWidgets.QMainWindow):
 	def __init__(self, parent=None):
 		super(MainForm, self).__init__(parent)
 
-		self.mainWidget = QtGui.QWidget()
-		self.mainLayout = QtGui.QVBoxLayout()
+		self.mainWidget = QtWidgets.QWidget()
+		self.mainLayout = QtWidgets.QVBoxLayout()
 		self.mainWidget.setLayout(self.mainLayout)
 
 		self.view = TestListView(self)
 		self.view.fileDropped.connect(self.fileDropped)
 
-		self.byLbl = QtGui.QLabel("GUI made by ShadeAnimator.")
+		self.byLbl = QtWidgets.QLabel("GUI made by ShadeAnimator.")
 
-		self.viewlabel = QtGui.QLabel("Drag and drop files here:")
+		self.viewlabel = QtWidgets.QLabel("Drag and drop files here:")
 
 		#region Pack Unpack Groupbox
-		self.groupBox = QtGui.QGroupBox("Action")
+		self.groupBox = QtWidgets.QGroupBox("Action")
 
-		self.unpackRB = QtGui.QRadioButton("&Unpack")
-		self.packRB = QtGui.QRadioButton("&Pack")
+		self.unpackRB = QtWidgets.QRadioButton("&Unpack")
+		self.packRB = QtWidgets.QRadioButton("&Pack")
 
 		self.unpackRB.setChecked(True)
 
 
-		vbox = QtGui.QVBoxLayout()
+		vbox = QtWidgets.QVBoxLayout()
 		vbox.addWidget(self.unpackRB)
 		vbox.addWidget(self.packRB)
 		vbox.addStretch(1)
 		self.groupBox.setLayout(vbox)
 		#endregion
-		self.pb = QtGui.QProgressBar()
+		self.pb = QtWidgets.QProgressBar()
 
-		self.button = QtGui.QPushButton("HKX <=> XML")
+		self.button = QtWidgets.QPushButton("HKX <=> XML")
 		self.button.clicked.connect(self.convertXmlHkx)
 		self.button.setToolTip("Convert HKX to XML and XML to HKX")
 
-		self.getTxtButton = QtGui.QPushButton("Generate rig.txt from skeleton.hkx")
+		self.getTxtButton = QtWidgets.QPushButton("Generate rig.txt from skeleton.hkx")
 		self.getTxtButton.clicked.connect(self.generateRigTxt)
 		self.getTxtButton.setToolTip("Given a skeleton.hkx or skeleton.xml file it will generate rig.txt for that skeleton.")
 
-		self.remove = QtGui.QPushButton("Remove selected")
+		self.remove = QtWidgets.QPushButton("Remove selected")
 		self.remove.clicked.connect(self.removeSelected)
 
-		self.clear = QtGui.QPushButton("Clear view")
+		self.clear = QtWidgets.QPushButton("Clear view")
 		self.clear.clicked.connect(self.clearView)
 
-		self.hkxToFbxGrp = QtGui.QGroupBox("HKX (32bit) => FBX")
+		self.hkxToFbxGrp = QtWidgets.QGroupBox("HKX (32bit) => FBX")
 
 		self.skeletonInput = inputBoxWithBrowse(label="skeleton.hkx", placeholderText="Locate skeleton.hkx file", defaultPath=os.path.join(rp, "skeleton.hkx"))
-		self.hkxToFbxBtn = QtGui.QPushButton("Convert HKX to FBX")
+		self.hkxToFbxBtn = QtWidgets.QPushButton("Convert HKX to FBX")
 		self.hkxToFbxBtn.clicked.connect(self.convertHkxToFBXAnimation)
 
-		self.hkxToFbxLayout = QtGui.QVBoxLayout()
+		self.hkxToFbxLayout = QtWidgets.QVBoxLayout()
 		self.hkxToFbxLayout.addWidget(self.skeletonInput)
 		self.hkxToFbxLayout.addWidget(self.hkxToFbxBtn)
 
@@ -160,7 +160,7 @@ class MainForm(QtGui.QMainWindow):
 	def fileDropped(self, l):
 		for url in l:
 			if os.path.exists(url):
-				item = QtGui.QListWidgetItem(url, self.view)
+				item = QtWidgets.QListWidgetItem(url, self.view)
 				item.setStatusTip(url)
 
 	def convertHkxToFBXAnimation(self):
@@ -247,7 +247,7 @@ class MainForm(QtGui.QMainWindow):
 			self.view.takeItem(self.view.row(item))
 
 def main():
-	app = QtGui.QApplication(sys.argv)
+	app = QtWidgets.QApplication(sys.argv)
 	form = MainForm()
 	form.show()
 	app.exec_()
