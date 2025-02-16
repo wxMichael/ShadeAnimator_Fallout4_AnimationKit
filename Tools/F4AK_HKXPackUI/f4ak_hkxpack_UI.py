@@ -5,9 +5,9 @@ import sys
 from bs4 import BeautifulSoup
 from PySide6 import QtCore, QtGui, QtWidgets
 
-rp = os.path.dirname(os.path.realpath(__file__))
-hkxCliJar = os.path.join(rp, "hkxpack-cli.jar")
-havokToFbx = os.path.join(rp, "havok2fbx.exe")
+real_path = os.path.dirname(os.path.realpath(__file__))
+hkxCliJar = os.path.join(real_path, "hkxpack-cli.jar")
+havokToFbx = os.path.join(real_path, "havok2fbx.exe")
 
 if not os.path.exists(hkxCliJar):
 	print(
@@ -137,7 +137,7 @@ class MainForm(QtWidgets.QMainWindow):
 		self.skeletonInput = inputBoxWithBrowse(
 			label="skeleton.hkx",
 			placeholderText="Locate skeleton.hkx file",
-			defaultPath=os.path.join(rp, "skeleton.hkx"),
+			defaultPath=os.path.join(real_path, "skeleton.hkx"),
 		)
 		self.hkxToFbxBtn = QtWidgets.QPushButton("Convert HKX to FBX")
 		self.hkxToFbxBtn.clicked.connect(self.convertHkxToFBXAnimation)
@@ -170,11 +170,11 @@ class MainForm(QtWidgets.QMainWindow):
 
 		self.setStyleSheet(css)
 
-	def fileDropped(self, l: list[str]) -> None:
-		for url in l:
-			if os.path.exists(url):
-				item = QtWidgets.QListWidgetItem(url, self.view)
-				item.setStatusTip(url)
+	def fileDropped(self, files: list[str]) -> None:
+		for file in files:
+			if os.path.exists(file):
+				item = QtWidgets.QListWidgetItem(file, self.view)
+				item.setStatusTip(file)
 
 	def convertHkxToFBXAnimation(self) -> None:
 		skeleton = self.skeletonInput.text()
